@@ -19,12 +19,13 @@ function save(){
 
 
 
-
 function showPage(page){
 
     document
     .querySelectorAll(".page")
-    .forEach(p=>p.classList.add("hidden"));
+    .forEach(p => {
+        p.classList.add("hidden");
+    });
 
 
     document
@@ -41,8 +42,14 @@ function showPage(page){
 async function refreshPrices(){
 
 
-    document.getElementById("status").innerHTML =
+    const status =
+    document.getElementById("status");
+
+
+    if(status)
+    status.innerHTML =
     "🔄 Mise à jour...";
+
 
 
 
@@ -53,24 +60,45 @@ async function refreshPrices(){
 
 
             let response = await fetch(
-                `${SERVER_URL}/item/${item.id}`
+
+                SERVER_URL +
+                "/item/" +
+                item.id +
+                "?nocache=" +
+                Date.now()
+
             );
 
 
-            let data = await response.json();
+
+            let data =
+            await response.json();
+
+
+
+            console.log(
+                "Réponse API :",
+                data
+            );
 
 
 
             if(data.success){
 
 
-                item.nom = data.name;
 
-                item.rap = data.rap;
+                item.nom =
+                data.name;
 
-                item.value = data.value;
 
-                item.prix = data.value;
+
+                item.rap =
+                Number(data.rap);
+
+
+
+                item.value =
+                Number(data.value);
 
 
 
@@ -78,18 +106,23 @@ async function refreshPrices(){
                 data.advice;
 
 
+
             }
 
 
-        }
-
-
-        catch(e){
-
-            console.log(e);
 
         }
 
+        catch(error){
+
+
+            console.log(
+                "Erreur API :",
+                error
+            );
+
+
+        }
 
 
     }
@@ -101,8 +134,10 @@ async function refreshPrices(){
     display();
 
 
-    document.getElementById("status").innerHTML =
-    "✅ Prix mis à jour";
+
+    if(status)
+    status.innerHTML =
+    "✅ Prix actualisés";
 
 
 }
@@ -122,95 +157,108 @@ function display(){
     document.getElementById("itemsList");
 
 
-    list.innerHTML="";
+
+    if(!list)
+    return;
 
 
 
-    let total=0;
-
-    let profitTotal=0;
+    list.innerHTML = "";
 
 
 
-    items.forEach((item,index)=>{
+    let totalValue = 0;
+
+    let totalProfit = 0;
+
+
+
+    items.forEach(
+    (item,index)=>{
+
+
+        let value =
+        Number(item.value) || 0;
+
+
+
+        let rap =
+        Number(item.rap) || 0;
+
+
+
+        let achat =
+        Number(item.achat) || 0;
+
 
 
         let profit =
-        item.prix - item.achat;
+        value - achat;
+
 
 
         let percent =
-        ((profit / item.achat)*100)
-        .toFixed(1);
-
-
-
-        total += item.prix;
-
-        profitTotal += profit;
-
-
-
-
-        let color =
-        profit >=0
+        achat > 0
         ?
-        "profit"
+        ((profit / achat) * 100)
+        .toFixed(1)
         :
-        "loss";
+        0;
 
+
+
+        totalValue += value;
+
+        totalProfit += profit;
 
 
 
 
         list.innerHTML += `
 
+
 <div class="card">
 
 
 <h3>
-${item.nom}
+🎩 ${item.nom}
 </h3>
 
 
 <p>
-ID : ${item.id}
+🆔 ID :
+${item.id}
 </p>
 
 
 <p>
 💸 Achat :
-${item.achat} Robux
+${achat} Robux
 </p>
 
 
 <p>
 📈 RAP :
-${item.rap || 0}
+${rap} Robux
 </p>
 
 
 <p>
 💎 Value :
-${item.value || 0}
+${value} Robux
 </p>
 
 
 <p>
-🔥 Profit :
-
-<span class="${color}">
+💰 Profit :
 ${profit} Robux
 (${percent}%)
-</span>
-
 </p>
-
 
 
 <p>
 🤖 Conseil :
-${item.conseil || "Pas encore analysé"}
+${item.conseil || "Analyse en cours"}
 </p>
 
 
@@ -222,6 +270,7 @@ ${item.conseil || "Pas encore analysé"}
 
 </div>
 
+
 `;
 
 
@@ -230,18 +279,32 @@ ${item.conseil || "Pas encore analysé"}
 
 
 
-    document.getElementById("totalValue")
-    .innerHTML =
-    total+" Robux";
+    let total =
+    document.getElementById("totalValue");
 
 
-    document.getElementById("totalProfit")
-    .innerHTML =
-    profitTotal+" Robux";
+    if(total)
+    total.innerHTML =
+    totalValue + " Robux";
 
 
-    document.getElementById("totalItems")
-    .innerHTML =
+
+    let profit =
+    document.getElementById("totalProfit");
+
+
+    if(profit)
+    profit.innerHTML =
+    totalProfit + " Robux";
+
+
+
+    let count =
+    document.getElementById("totalItems");
+
+
+    if(count)
+    count.innerHTML =
     items.length;
 
 
@@ -260,23 +323,33 @@ async function addItem(){
 
 
     let id =
-    document.getElementById("itemId").value;
+    document
+    .getElementById("itemId")
+    .value;
 
 
-    let buy =
+
+    let achat =
     Number(
-    document.getElementById("buyPrice").value
+    document
+    .getElementById("buyPrice")
+    .value
     );
 
 
 
-    if(!id || !buy){
+    if(!id || !achat){
 
-        alert("Ajoute ID + prix achat");
+
+        alert(
+        "Ajoute un ID et un prix d'achat"
+        );
+
 
         return;
 
     }
+
 
 
 
@@ -286,13 +359,13 @@ async function addItem(){
 
         nom:"Chargement...",
 
-        achat:buy,
-
-        prix:buy,
+        achat:achat,
 
         rap:0,
 
-        value:0
+        value:0,
+
+        conseil:""
 
     });
 
@@ -301,10 +374,15 @@ async function addItem(){
     save();
 
 
+
     await refreshPrices();
 
 
-    alert("Limited ajouté ✅");
+
+    alert(
+    "Limited ajouté ✅"
+    );
+
 
 
 }
@@ -318,7 +396,7 @@ async function addItem(){
 function changeBuy(index){
 
 
-    let price =
+    let prix =
     prompt(
     "Nouveau prix d'achat :",
     items[index].achat
@@ -326,16 +404,18 @@ function changeBuy(index){
 
 
 
-    if(price){
+    if(prix){
 
 
         items[index].achat =
-        Number(price);
+        Number(prix);
+
 
 
         save();
 
         display();
+
 
     }
 
@@ -347,11 +427,15 @@ function changeBuy(index){
 
 
 
-setInterval(()=>{
+
+setInterval(
+()=>{
 
     refreshPrices();
 
-},300000);
+},
+300000
+);
 
 
 
