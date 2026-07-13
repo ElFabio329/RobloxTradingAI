@@ -1,22 +1,11 @@
 const SERVER_URL = "https://robloxtradingai.onrender.com";
 
-let items = JSON.parse(localStorage.getItem("robloxItems")) || [
 
-{
-    id:97911105474335,
-    nom:"Red Sparkle Squid",
-    achat:335,
-    prix:335
-},
+let items = JSON.parse(
+    localStorage.getItem("robloxItems")
+) || [];
 
-{
-    id:97461784744442,
-    nom:"Christmas Gingerbread Valkyrie",
-    achat:800,
-    prix:800
-}
 
-];
 
 function save(){
 
@@ -27,82 +16,134 @@ function save(){
 
 }
 
+
+
+
+
 function showPage(page){
 
-    document.querySelectorAll(".page")
+    document
+    .querySelectorAll(".page")
     .forEach(p=>{
 
         p.classList.add("hidden");
 
     });
 
-    document.getElementById(page)
+
+    document
+    .getElementById(page)
     .classList.remove("hidden");
 
 }
 
+
+
+
+
 async function refreshPrices(){
 
+
     document.getElementById("status").innerHTML =
-    "🔄 Mise à jour des prix...";
+    "🔄 Mise à jour...";
+
+
 
     for(let item of items){
 
+
         try{
+
 
             let response = await fetch(
                 `${SERVER_URL}/item/${item.id}`
             );
 
+
             let data = await response.json();
+
+
 
             if(data.success){
 
+
+                item.nom = data.name;
+
+                item.rap = data.rap;
+
+                item.value = data.value;
+
                 item.prix = data.value || data.rap;
 
+
             }
+
+
 
         }
 
         catch(error){
 
-            console.log(
-                "Erreur API :",
-                error
-            );
+
+            console.log(error);
+
 
         }
 
+
     }
+
+
 
     save();
 
     display();
 
+
+
     document.getElementById("status").innerHTML =
-    "✅ Prix actualisés";
+    "✅ Mise à jour terminée";
+
 
 }
 
+
+
+
+
+
+
+
 function display(){
+
 
     let list =
     document.getElementById("itemsList");
 
-    list.innerHTML="";
+
+    list.innerHTML = "";
+
+
 
     let total = 0;
 
     let profitTotal = 0;
 
+
+
     items.forEach((item,index)=>{
+
 
         let profit =
         item.prix - item.achat;
 
+
+
         total += item.prix;
 
         profitTotal += profit;
+
+
 
         let color =
         profit >= 0
@@ -111,27 +152,47 @@ function display(){
         :
         "loss";
 
+
+
+
         list.innerHTML += `
 
+
         <div class="card">
+
 
         <h3>
         ${item.nom}
         </h3>
 
+
+
         <p>
         ID : ${item.id}
         </p>
+
+
 
         <p>
         Achat :
         ${item.achat} Robux
         </p>
 
+
+
         <p>
-        Valeur :
-        ${item.prix} Robux
+        RAP :
+        ${item.rap || 0} Robux
         </p>
+
+
+
+        <p>
+        Value :
+        ${item.value || 0} Robux
+        </p>
+
+
 
         <p>
         Profit :
@@ -142,100 +203,206 @@ function display(){
 
         </p>
 
+
+
         <button onclick="changeBuy(${index})">
+
         ✏️ Modifier achat
+
         </button>
+
+
 
         </div>
 
+
         `;
 
+
     });
+
+
+
 
     document.getElementById("totalValue")
     .innerHTML =
     total+" Robux";
 
+
+
     document.getElementById("totalProfit")
     .innerHTML =
     profitTotal+" Robux";
+
+
 
     document.getElementById("totalItems")
     .innerHTML =
     items.length;
 
+
+
     checkAlerts();
+
+
 
 }
 
-function addItem(){
+
+
+
+
+
+
+
+
+async function addItem(){
+
+
 
     let id =
-    Number(document.getElementById("itemId").value);
+    document.getElementById("itemId").value;
+
+
 
     let name =
-    document.getElementById("itemName").value;
+    document.getElementById("itemName").value
+    ||
+    "Limited Roblox";
+
+
 
     let buy =
-    Number(document.getElementById("buyPrice").value);
+    Number(
+        document.getElementById("buyPrice").value
+    );
 
-    items.push({
+
+
+    if(!id || !buy){
+
+
+        alert("Mets un ID et un prix d'achat");
+
+        return;
+
+
+    }
+
+
+
+    let newItem = {
+
 
         id:id,
 
-        nom:
-        name || "Limited Roblox",
+        nom:name,
 
         achat:buy,
 
-        prix:buy
+        prix:buy,
 
-    });
+        rap:0,
+
+        value:0
+
+
+    };
+
+
+
+    items.push(newItem);
+
+
 
     save();
 
-    display();
+
+    await refreshPrices();
+
 
     alert("Limited ajouté ✅");
 
+
 }
+
+
+
+
+
+
+
+
 
 function changeBuy(index){
 
-    let newPrice =
-    prompt(
+
+
+    let price = prompt(
+
         "Nouveau prix d'achat :",
+
         items[index].achat
+
     );
 
-    if(newPrice){
+
+
+    if(price){
+
 
         items[index].achat =
-        Number(newPrice);
+        Number(price);
+
+
 
         save();
 
         display();
 
+
     }
+
+
 
 }
 
+
+
+
+
+
+
+
+
+
 function checkAlerts(){
+
+
 
     let box =
     document.getElementById("alerts");
 
-    let messages=[];
+
+
+    let messages = [];
+
+
 
     items.forEach(item=>{
+
 
         let profit =
         item.prix - item.achat;
 
+
+
         if(profit >= 20){
 
+
+
             messages.push(
+
             "🔔 "
             +
             item.nom
@@ -245,13 +412,20 @@ function checkAlerts(){
             profit
             +
             " Robux"
+
             );
+
 
             playSound();
 
+
         }
 
+
+
     });
+
+
 
     box.innerHTML =
 
@@ -265,28 +439,54 @@ function checkAlerts(){
 
     "Aucune alerte";
 
+
+
 }
 
+
+
+
+
+
+
+
 function playSound(){
+
+
 
     let sound =
     document.getElementById("alertSound");
 
+
+
     if(sound){
+
 
         sound.play()
         .catch(()=>{});
 
+
     }
+
+
 
 }
 
+
+
+
+
+
 setInterval(()=>{
+
 
     refreshPrices();
 
+
 },300000);
 
-refreshPrices();
+
+
+
 
 display();
