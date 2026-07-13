@@ -2,26 +2,63 @@ from flask import Flask, jsonify
 import os
 import time
 
+
 app = Flask(__name__)
 
 
-print("✅ Roblox Trading AI Server lancé")
+print("✅ Roblox Trading AI V2 lancé")
+
 
 
 # Cache 5 minutes
+
+CACHE_TIME = 300
+
 cache = {}
 
-CACHE_DURATION = 300
 
 
+# Structure des données
+# Cette partie sera branchée à la vraie source ensuite
 
-# Base prête à recevoir les vraies données
-# Format :
-# ID Roblox : infos Limited
-
-limiteds = {
+items = {
 
 }
+
+
+
+def analyse_item(item):
+
+
+    rap = item["rap"]
+
+    value = item["value"]
+
+
+    difference = value - rap
+
+
+
+    if difference > 50:
+
+        conseil = "🟢 GARDER - Value supérieure au RAP"
+
+
+    elif value < rap:
+
+        conseil = "🔴 ATTENTION - Value faible"
+
+
+    else:
+
+        conseil = "🟡 SURVEILLER"
+
+
+
+    return conseil
+
+
+
 
 
 
@@ -30,11 +67,15 @@ def home():
 
     return jsonify({
 
-        "success": True,
-        "status": "online",
-        "message": "Roblox Trading AI Server"
+        "success":True,
+
+        "status":"online",
+
+        "message":"Roblox Trading AI V2"
 
     })
+
+
 
 
 
@@ -47,103 +88,78 @@ def get_item(item_id):
     now = time.time()
 
 
-    # Cache
+
     if item_id in cache:
 
-        if now - cache[item_id]["time"] < CACHE_DURATION:
+
+        if now - cache[item_id]["time"] < CACHE_TIME:
 
             return jsonify(cache[item_id]["data"])
 
 
 
 
-    # Recherche
-
-    if item_id not in limiteds:
+    if item_id not in items:
 
 
         return jsonify({
 
-            "success": False,
+            "success":False,
 
-            "error": "Limited non trouvé"
+            "error":"Limited non trouvé"
 
         })
 
 
 
 
-    item = limiteds[item_id]
+
+    item = items[item_id]
 
 
 
-    result = {
+    data = {
 
-        "success": True,
 
-        "id": item_id,
+        "success":True,
 
-        "name": item["name"],
+        "id":item_id,
 
-        "rap": item["rap"],
+        "name":item["name"],
 
-        "value": item["value"],
 
-        "updated": now
+        "rap":item["rap"],
+
+
+        "value":item["value"],
+
+
+        "resell":item["value"],
+
+
+        "advice":analyse_item(item),
+
+
+        "updated":now
+
+
+    }
+
+
+
+    cache[item_id]={
+
+        "time":now,
+
+        "data":data
 
     }
 
 
 
 
-    cache[item_id] = {
+    return jsonify(data)
 
-        "time": now,
-
-        "data": result
-
-    }
-
-
-
-    return jsonify(result)
-
-
-
-
-
-@app.route("/search/<name>")
-def search(name):
-
-
-    results = []
-
-
-    for item_id, item in limiteds.items():
-
-        if name.lower() in item["name"].lower():
-
-            results.append({
-
-                "id": item_id,
-
-                "name": item["name"],
-
-                "rap": item["rap"],
-
-                "value": item["value"]
-
-            })
-
-
-
-    return jsonify({
-
-        "success": True,
-
-        "results": results
-
-    })
 
 
 
@@ -154,7 +170,7 @@ def search(name):
 if __name__ == "__main__":
 
 
-    port = int(os.environ.get("PORT",10000))
+    port=int(os.environ.get("PORT",10000))
 
 
     app.run(
