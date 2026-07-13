@@ -1,135 +1,310 @@
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
 }
 
 
-body{
+body {
 
-background:#0b0f19;
-color:white;
-padding:20px;
+    margin: 0;
 
-}
+    background: #f2f2f2;
 
-
-
-header{
-
-background:#151c2c;
-padding:20px;
-border-radius:20px;
-margin-bottom:20px;
+    color: #111;
 
 }
 
 
 
-h1{
+header {
 
-color:#00aaff;
+    background: #111;
 
-}
+    color: white;
 
+    text-align: center;
 
-
-nav{
-
-display:flex;
-gap:10px;
-margin-bottom:20px;
-
-}
-
-
-button{
-
-background:#008cff;
-color:white;
-border:none;
-padding:12px;
-border-radius:12px;
-cursor:pointer;
+    padding: 20px;
 
 }
 
 
 
-button:hover{
+header h1 {
 
-opacity:0.8;
+    margin: 0;
+
+    font-size: 26px;
+
+}
+
+
+
+#status {
+
+    margin-top: 10px;
+
+    font-size: 14px;
 
 }
 
 
 
 
-.dashboard{
-
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:10px;
-
-}
 
 
+nav {
 
-.box{
+    display: flex;
 
-background:#151c2c;
-padding:15px;
-border-radius:18px;
-text-align:center;
+    justify-content: space-around;
 
-}
+    background: white;
 
+    padding: 10px;
 
+    position: sticky;
 
-.card{
-
-background:#151c2c;
-padding:20px;
-border-radius:20px;
-margin-top:15px;
+    top: 0;
 
 }
 
 
 
-input{
+nav button {
 
-width:100%;
-padding:12px;
-margin-top:10px;
-border-radius:10px;
-border:none;
+    border: none;
+
+    background: #111;
+
+    color: white;
+
+    padding: 10px;
+
+    border-radius: 10px;
+
+    font-size: 14px;
 
 }
 
 
 
 
-.profit{
-
-color:#00ff88;
-
-}
 
 
+.page {
 
-.loss{
-
-color:#ff5555;
+    padding: 15px;
 
 }
 
 
 
+.hidden {
 
-.hidden{
+    display: none;
 
-display:none;
+}
+
+
+
+
+
+
+.dashboard {
+
+    display: grid;
+
+    grid-template-columns: repeat(3,1fr);
+
+    gap: 10px;
+
+}
+
+
+
+.box {
+
+    background: white;
+
+    padding: 15px;
+
+    border-radius: 15px;
+
+    text-align: center;
+
+    box-shadow: 0 3px 8px #ccc;
+
+}
+
+
+
+.box h3 {
+
+    margin: 5px;
+
+    font-size: 14px;
+
+}
+
+
+
+.box p {
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+}
+
+
+
+
+
+
+
+.card {
+
+    background:white;
+
+    margin:15px 0;
+
+    padding:15px;
+
+    border-radius:15px;
+
+    box-shadow:0 3px 10px #ccc;
+
+}
+
+
+
+.card h3 {
+
+    margin-top:0;
+
+}
+
+
+
+
+
+
+.profit {
+
+    color:green;
+
+    font-weight:bold;
+
+}
+
+
+
+.loss {
+
+    color:red;
+
+    font-weight:bold;
+
+}
+
+
+
+
+
+
+#alerts {
+
+    background:white;
+
+    padding:15px;
+
+    border-radius:15px;
+
+    font-weight:bold;
+
+}
+
+
+
+
+
+
+input {
+
+    width:100%;
+
+    padding:15px;
+
+    margin:8px 0;
+
+    border-radius:10px;
+
+    border:1px solid #ccc;
+
+    font-size:16px;
+
+}
+
+
+
+button {
+
+    cursor:pointer;
+
+}
+
+
+
+
+
+
+section button {
+
+    background:#111;
+
+    color:white;
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:10px;
+
+}
+
+
+
+
+
+
+
+@media(max-width:600px){
+
+
+.dashboard {
+
+    grid-template-columns:1fr;
+
+}
+
+
+
+nav {
+
+    flex-wrap:wrap;
+
+    gap:5px;
+
+}
+
+
+
+nav button {
+
+    flex:1;
+
+}
+
 
 }
