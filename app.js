@@ -1,5 +1,4 @@
-const SERVER_URL = "http://192.168.1.91:5000";
-
+const SERVER_URL = "https://robloxtradingai.onrender.com";
 
 let items = JSON.parse(localStorage.getItem("robloxItems")) || [
 
@@ -19,8 +18,6 @@ let items = JSON.parse(localStorage.getItem("robloxItems")) || [
 
 ];
 
-
-
 function save(){
 
     localStorage.setItem(
@@ -29,9 +26,6 @@ function save(){
     );
 
 }
-
-
-
 
 function showPage(page){
 
@@ -42,114 +36,73 @@ function showPage(page){
 
     });
 
-
     document.getElementById(page)
     .classList.remove("hidden");
 
 }
 
-
-
-
 async function refreshPrices(){
-
 
     document.getElementById("status").innerHTML =
     "🔄 Mise à jour des prix...";
 
-
-
     for(let item of items){
-
 
         try{
 
-
             let response = await fetch(
-                `${SERVER_URL}/rap/${item.id}`
+                `${SERVER_URL}/item/${item.id}`
             );
-
-
 
             let data = await response.json();
 
+            if(data.success){
 
-
-            if(data.success && data.rap > 0){
-
-
-                item.prix = data.rap;
-
+                item.prix = data.value || data.rap;
 
             }
-
-
 
         }
 
         catch(error){
 
-
             console.log(
-                "Erreur RAP :",
+                "Erreur API :",
                 error
             );
 
-
         }
 
-
     }
-
-
 
     save();
 
     display();
 
-
-
     document.getElementById("status").innerHTML =
     "✅ Prix actualisés";
 
-
 }
 
-
-
-
-
-
 function display(){
-
 
     let list =
     document.getElementById("itemsList");
 
-
     list.innerHTML="";
-
-
 
     let total = 0;
 
     let profitTotal = 0;
 
-
-
     items.forEach((item,index)=>{
-
 
         let profit =
         item.prix - item.achat;
 
-
-
         total += item.prix;
 
         profitTotal += profit;
-
-
 
         let color =
         profit >= 0
@@ -158,36 +111,27 @@ function display(){
         :
         "loss";
 
-
-
-
         list.innerHTML += `
 
         <div class="card">
-
 
         <h3>
         ${item.nom}
         </h3>
 
-
         <p>
         ID : ${item.id}
         </p>
-
 
         <p>
         Achat :
         ${item.achat} Robux
         </p>
 
-
         <p>
-        RAP :
+        Valeur :
         ${item.prix} Robux
         </p>
-
-
 
         <p>
         Profit :
@@ -198,67 +142,42 @@ function display(){
 
         </p>
 
-
         <button onclick="changeBuy(${index})">
         ✏️ Modifier achat
         </button>
-
 
         </div>
 
         `;
 
-
     });
-
-
 
     document.getElementById("totalValue")
     .innerHTML =
     total+" Robux";
 
-
-
     document.getElementById("totalProfit")
     .innerHTML =
     profitTotal+" Robux";
-
-
 
     document.getElementById("totalItems")
     .innerHTML =
     items.length;
 
-
-
     checkAlerts();
-
 
 }
 
-
-
-
-
-
 function addItem(){
-
 
     let id =
     Number(document.getElementById("itemId").value);
 
-
-
     let name =
     document.getElementById("itemName").value;
 
-
-
     let buy =
     Number(document.getElementById("buyPrice").value);
-
-
-
 
     items.push({
 
@@ -273,26 +192,15 @@ function addItem(){
 
     });
 
-
-
     save();
 
     display();
 
-
-
     alert("Limited ajouté ✅");
-
 
 }
 
-
-
-
-
-
 function changeBuy(index){
-
 
     let newPrice =
     prompt(
@@ -300,53 +208,32 @@ function changeBuy(index){
         items[index].achat
     );
 
-
-
     if(newPrice){
-
 
         items[index].achat =
         Number(newPrice);
-
-
 
         save();
 
         display();
 
-
     }
-
 
 }
 
-
-
-
-
-
 function checkAlerts(){
-
 
     let box =
     document.getElementById("alerts");
 
-
-
     let messages=[];
 
-
-
     items.forEach(item=>{
-
 
         let profit =
         item.prix - item.achat;
 
-
-
         if(profit >= 20){
-
 
             messages.push(
             "🔔 "
@@ -360,16 +247,11 @@ function checkAlerts(){
             " Robux"
             );
 
-
             playSound();
-
 
         }
 
-
     });
-
-
 
     box.innerHTML =
 
@@ -383,38 +265,21 @@ function checkAlerts(){
 
     "Aucune alerte";
 
-
 }
 
-
-
-
-
-
 function playSound(){
-
 
     let sound =
     document.getElementById("alertSound");
 
-
-
     if(sound){
-
 
         sound.play()
         .catch(()=>{});
 
-
     }
 
-
 }
-
-
-
-
-
 
 setInterval(()=>{
 
@@ -422,8 +287,6 @@ setInterval(()=>{
 
 },300000);
 
-
-
-
+refreshPrices();
 
 display();
