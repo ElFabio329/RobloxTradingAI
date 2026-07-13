@@ -9,14 +9,11 @@
 
 <title>Roblox Trading AI</title>
 
-
 <link rel="stylesheet" href="style.css">
-
 
 <link rel="manifest" href="manifest.json">
 
 <meta name="theme-color" content="#111111">
-
 
 </head>
 
@@ -65,11 +62,13 @@ Connecté
 
 
 
+
+
 <section id="home" class="page">
 
 
 <h2>
-Dashboard
+📊 Dashboard
 </h2>
 
 
@@ -79,9 +78,7 @@ Dashboard
 
 <div class="box">
 
-<h3>
-💰 Valeur
-</h3>
+<h3>💰 Valeur</h3>
 
 <p id="totalValue">
 0 Robux
@@ -91,12 +88,9 @@ Dashboard
 
 
 
-
 <div class="box">
 
-<h3>
-📈 Profit
-</h3>
+<h3>📈 Profit</h3>
 
 <p id="totalProfit">
 0 Robux
@@ -106,13 +100,9 @@ Dashboard
 
 
 
-
-
 <div class="box">
 
-<h3>
-🎩 Items
-</h3>
+<h3>🎩 Items</h3>
 
 <p id="totalItems">
 0
@@ -129,17 +119,36 @@ Dashboard
 
 
 <h2>
+🔄 Mise à jour
+</h2>
+
+
+<button onclick="refreshPrices()">
+
+🔄 Mettre à jour les prix
+
+</button>
+
+
+
+
+
+<h2>
 🔔 Alertes
 </h2>
 
 
 <div id="alerts">
+
 Aucune alerte
+
 </div>
 
 
 
+
 </section>
+
 
 
 
@@ -171,7 +180,6 @@ Aucune alerte
 
 
 
-
 <section id="add" class="page hidden">
 
 
@@ -190,16 +198,17 @@ placeholder="ID Roblox"
 
 <input 
 id="itemName"
-placeholder="Nom"
+placeholder="Nom du Limited"
 >
 
 
 
 <input 
 id="buyPrice"
-placeholder="Prix achat"
+placeholder="Prix d'achat"
 type="number"
 >
+
 
 
 
@@ -243,6 +252,7 @@ Bientôt disponible 🚀
 
 
 
+
 <audio id="alertSound">
 
 <source 
@@ -251,6 +261,7 @@ type="audio/ogg"
 >
 
 </audio>
+
 
 
 
