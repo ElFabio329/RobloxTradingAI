@@ -2,35 +2,28 @@
 <html lang="fr">
 
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Roblox Trading AI</title>
 
 <link rel="stylesheet" href="style.css">
-
-<link rel="manifest" href="manifest.json">
-
-<meta name="theme-color" content="#111111">
-
 </head>
 
 
 <body>
 
-
 <header>
 
 <h1>🤖 Roblox Trading AI</h1>
 
-<p id="status">
-Connecté
-</p>
+<p id="status">Connecté</p>
+
+<button onclick="refreshPrices()">
+🔄 Actualiser les prix
+</button>
 
 </header>
-
 
 
 
@@ -40,21 +33,17 @@ Connecté
 🏠 Accueil
 </button>
 
-
 <button onclick="showPage('items')">
 🎩 Limiteds
 </button>
-
 
 <button onclick="showPage('add')">
 ➕ Ajouter
 </button>
 
-
 <button onclick="showPage('trades')">
 🤝 Trades
 </button>
-
 
 </nav>
 
@@ -62,15 +51,9 @@ Connecté
 
 
 
-
-
 <section id="home" class="page">
 
-
-<h2>
-📊 Dashboard
-</h2>
-
+<h2>Dashboard</h2>
 
 
 <div class="dashboard">
@@ -111,40 +94,16 @@ Connecté
 </div>
 
 
-
 </div>
 
 
 
 
-
-<h2>
-🔄 Mise à jour
-</h2>
-
-
-<button onclick="refreshPrices()">
-
-🔄 Mettre à jour les prix
-
-</button>
-
-
-
-
-
-<h2>
-🔔 Alertes
-</h2>
-
+<h2>🔔 Alertes</h2>
 
 <div id="alerts">
-
 Aucune alerte
-
 </div>
-
-
 
 
 </section>
@@ -155,14 +114,10 @@ Aucune alerte
 
 
 
-
-
 <section id="items" class="page hidden">
 
 
-<h2>
-🎩 Mes Limiteds
-</h2>
+<h2>🎩 Mes Limiteds</h2>
 
 
 <div id="itemsList">
@@ -178,37 +133,22 @@ Aucune alerte
 
 
 
-
-
 <section id="add" class="page hidden">
 
 
-<h2>
-➕ Ajouter un Limited
-</h2>
+<h2>➕ Ajouter un Limited</h2>
 
 
 
-<input 
-id="itemId"
-placeholder="ID Roblox"
->
+<input id="itemId" placeholder="ID Roblox">
 
 
 
-<input 
-id="itemName"
-placeholder="Nom du Limited"
->
+<input id="itemName" placeholder="Nom (optionnel)">
 
 
 
-<input 
-id="buyPrice"
-placeholder="Prix d'achat"
-type="number"
->
-
+<input id="buyPrice" placeholder="Prix achat">
 
 
 
@@ -219,9 +159,7 @@ Ajouter
 </button>
 
 
-
 </section>
-
 
 
 
@@ -233,15 +171,12 @@ Ajouter
 <section id="trades" class="page hidden">
 
 
-<h2>
-🤝 Trade Calculator
-</h2>
+<h2>🤝 Trade Calculator</h2>
 
 
 <p>
 Bientôt disponible 🚀
 </p>
-
 
 
 </section>
@@ -252,13 +187,9 @@ Bientôt disponible 🚀
 
 
 
-
 <audio id="alertSound">
 
-<source 
-src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
-type="audio/ogg"
->
+<source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg">
 
 </audio>
 
@@ -266,9 +197,7 @@ type="audio/ogg"
 
 
 
-
 <script src="app.js"></script>
-
 
 
 </body>
