@@ -1,258 +1,245 @@
-const SERVER_URL =
-"https://robloxtradingai.onrender.com";
+<!DOCTYPE html>
+<html lang="fr">
 
+<head>
 
+<meta charset="UTF-8">
 
-let items = [
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-{
-id:"97911105474335",
-nom:"Red Sparkle Squid",
-achat:300,
-rap:0,
-value:0,
-conseil:""
-},
+<title>Roblox Trading AI</title>
 
-{
-id:"97461784744442",
-nom:"Christmas Gingerbread Valkyrie",
-achat:800,
-rap:0,
-value:0,
-conseil:""
-}
+<link rel="stylesheet" href="style.css">
 
-];
+<link rel="manifest" href="manifest.json">
 
+</head>
 
 
+<body>
 
 
-function save(){
+<header>
 
-localStorage.setItem(
-"robloxItems",
-JSON.stringify(items)
-);
+<h1>🤖 Roblox Trading AI</h1>
 
-}
+<p id="status">
+Connecté
+</p>
 
+<button onclick="refreshPrices()">
+🔄 Actualiser les prix
+</button>
 
+</header>
 
 
 
-async function refreshPrices(){
+<nav>
 
+<button onclick="showPage('home')">
+🏠 Accueil
+</button>
 
-document.getElementById("status").innerHTML =
-"🔄 Mise à jour...";
 
+<button onclick="showPage('items')">
+🎩 Limiteds
+</button>
 
 
-for(let item of items){
+<button onclick="showPage('add')">
+➕ Ajouter
+</button>
 
 
-try{
+<button onclick="showPage('trades')">
+🤝 Trades
+</button>
 
 
-let response =
-await fetch(
-SERVER_URL+
-"/item/"+
-item.id+
-"?time="+Date.now()
-);
+</nav>
 
 
 
-let data =
-await response.json();
 
 
+<section id="home" class="page">
 
-console.log(
-"API :",
-data
-);
 
+<h2>
+📊 Dashboard
+</h2>
 
 
-if(data.success){
+<div class="dashboard">
 
 
-item.nom=data.name;
-
-item.rap=Number(data.rap);
-
-item.value=Number(data.value);
-
-item.conseil=data.advice;
-
-
-}
-
-
-}
-
-catch(error){
-
-console.log(error);
-
-}
-
-
-}
-
-
-
-save();
-
-display();
-
-
-
-document.getElementById("status").innerHTML =
-"✅ Actualisé";
-
-
-}
-
-
-
-
-
-
-
-
-function display(){
-
-
-let list =
-document.getElementById("itemsList");
-
-
-list.innerHTML="";
-
-
-
-let total=0;
-
-
-
-items.forEach((item,index)=>{
-
-
-let profit =
-item.value-item.achat;
-
-
-
-total+=item.value;
-
-
-
-list.innerHTML+=`
-
-<div class="card">
+<div class="box">
 
 <h3>
-🎩 ${item.nom}
+💰 Valeur
 </h3>
 
-
-<p>
-ID : ${item.id}
+<p id="totalValue">
+0 Robux
 </p>
 
+</div>
 
-<p>
-💸 Achat :
-${item.achat} Robux
+
+
+<div class="box">
+
+<h3>
+📈 Profit
+</h3>
+
+<p id="totalProfit">
+0 Robux
 </p>
 
+</div>
 
-<p>
-📈 RAP :
-${item.rap} Robux
+
+
+<div class="box">
+
+<h3>
+🎩 Items
+</h3>
+
+<p id="totalItems">
+0
 </p>
 
+</div>
 
-<p>
-💎 Value :
-${item.value} Robux
-</p>
-
-
-<p>
-💰 Profit :
-${profit} Robux
-</p>
-
-
-<p>
-🤖 ${item.conseil}
-</p>
-
-
-<button onclick="changeBuy(${index})">
-Modifier achat
-</button>
 
 
 </div>
 
-`;
 
 
-
-});
-
-
-
-document.getElementById("totalValue")
-.innerHTML =
-total+" Robux";
+<h2>
+🔔 Alertes
+</h2>
 
 
-document.getElementById("totalItems")
-.innerHTML =
-items.length;
+<div id="alerts">
+Aucune alerte
+</div>
 
 
-}
+</section>
 
 
 
 
 
-function changeBuy(index){
 
 
-let p =
-prompt(
-"Prix achat :",
-items[index].achat
-);
+<section id="items" class="page hidden">
 
 
-if(p){
-
-items[index].achat =
-Number(p);
-
-
-save();
-
-display();
-
-}
+<h2>
+🎩 Mes Limiteds
+</h2>
 
 
-}
+<div id="itemsList">
+
+</div>
+
+
+</section>
 
 
 
 
 
-display();
+
+
+
+<section id="add" class="page hidden">
+
+
+<h2>
+➕ Ajouter un Limited
+</h2>
+
+
+<input 
+id="itemId"
+placeholder="ID Roblox">
+
+
+<br>
+
+
+<input 
+id="itemName"
+placeholder="Nom">
+
+
+<br>
+
+
+<input
+id="buyPrice"
+placeholder="Prix achat">
+
+
+<br>
+
+
+<button onclick="addItem()">
+Ajouter
+</button>
+
+
+</section>
+
+
+
+
+
+
+
+
+<section id="trades" class="page hidden">
+
+
+<h2>
+🤝 Trade Calculator
+</h2>
+
+
+<p>
+Bientôt disponible 🚀
+</p>
+
+
+</section>
+
+
+
+
+
+
+
+<audio id="alertSound">
+
+<source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg">
+
+</audio>
+
+
+
+
+
+<script src="app.js?v=11"></script>
+
+
+</body>
+
+</html>
