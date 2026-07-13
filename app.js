@@ -18,11 +18,10 @@ function save(){
 
 
 
-
 function showPage(page){
 
     document.querySelectorAll(".page")
-    .forEach(p=>p.classList.add("hidden"));
+    .forEach(p => p.classList.add("hidden"));
 
     document.getElementById(page)
     .classList.remove("hidden");
@@ -32,29 +31,34 @@ function showPage(page){
 
 
 
-
 async function refreshPrices(){
 
 
     document.getElementById("status").innerHTML =
-    "🔄 Mise à jour...";
-
+    "🔄 Connexion serveur...";
 
 
     for(let item of items){
+
+
+        console.log(
+            "Envoi ID :",
+            item.id
+        );
 
 
         try{
 
 
             let response = await fetch(
-                SERVER_URL +
-                "/item/" +
-                item.id +
-                "?refresh=" +
-                Date.now()
+                `${SERVER_URL}/item/${item.id}`
             );
 
+
+            console.log(
+                "Status HTTP :",
+                response.status
+            );
 
 
             let data =
@@ -63,26 +67,41 @@ async function refreshPrices(){
 
 
             console.log(
-                "DONNEES SERVEUR :",
+                "Réponse complète :",
                 data
             );
 
 
 
-            if(data.success === true){
+            if(data.success){
 
 
-                item.nom = data.name;
+                item.nom =
+                data.name;
 
-                item.rap = data.rap;
 
-                item.value = data.value;
+                item.rap =
+                Number(data.rap);
 
-                item.conseil = data.advice;
+
+                item.value =
+                Number(data.value);
+
+
+
+                item.conseil =
+                data.advice;
+
+
+
+                console.log(
+                    "Sauvegarde :",
+                    item.rap,
+                    item.value
+                );
 
 
             }
-
 
         }
 
@@ -90,13 +109,12 @@ async function refreshPrices(){
 
 
             console.log(
-                "ERREUR :",
+                "ERREUR FETCH :",
                 error
             );
 
 
         }
-
 
     }
 
@@ -104,17 +122,15 @@ async function refreshPrices(){
 
     save();
 
+
     display();
 
 
-
     document.getElementById("status").innerHTML =
-    "✅ Prix actualisés";
+    "✅ Terminé";
 
 
 }
-
-
 
 
 
@@ -128,50 +144,33 @@ function display(){
     document.getElementById("itemsList");
 
 
-
-    list.innerHTML = "";
+    list.innerHTML="";
 
 
 
     items.forEach((item,index)=>{
 
 
-
         let rap =
-        item.rap !== undefined
-        ? item.rap
-        : 0;
-
+        item.rap ?? "ERREUR";
 
 
         let value =
-        item.value !== undefined
-        ? item.value
-        : 0;
-
-
-
-        let profit =
-        value - item.achat;
-
+        item.value ?? "ERREUR";
 
 
 
         list.innerHTML += `
 
-
 <div class="card">
 
-
 <h3>
-🎩 ${item.nom}
+${item.nom}
 </h3>
 
-
-<p>
-🆔 ${item.id}
+<p>ID :
+${item.id}
 </p>
-
 
 
 <p>
@@ -180,40 +179,29 @@ ${item.achat} Robux
 </p>
 
 
-
 <p>
 📈 RAP :
 ${rap} Robux
 </p>
 
 
-
 <p>
-💎 Value :
+💎 VALUE :
 ${value} Robux
 </p>
 
 
-
 <p>
-💰 Profit :
-${profit} Robux
-</p>
-
-
-
-<p>
-🤖 ${item.conseil || "Pas encore analysé"}
+🤖 ${item.conseil || "Aucun"}
 </p>
 
 
 <button onclick="changeBuy(${index})">
-✏️ Modifier achat
+Modifier achat
 </button>
 
 
 </div>
-
 
 `;
 
@@ -223,8 +211,6 @@ ${profit} Robux
 
 
 }
-
-
 
 
 
@@ -241,7 +227,7 @@ async function addItem(){
 
     let achat =
     Number(
-        document.getElementById("buyPrice").value
+    document.getElementById("buyPrice").value
     );
 
 
@@ -254,11 +240,11 @@ async function addItem(){
 
         achat:achat,
 
-        rap:null,
+        rap:0,
 
-        value:null,
+        value:0,
 
-        conseil:"Analyse..."
+        conseil:""
 
     });
 
@@ -276,8 +262,6 @@ async function addItem(){
 
 
 
-
-
 function changeBuy(index){
 
 
@@ -290,10 +274,8 @@ function changeBuy(index){
 
     if(prix){
 
-
         items[index].achat =
         Number(prix);
-
 
         save();
 
@@ -303,7 +285,6 @@ function changeBuy(index){
 
 
 }
-
 
 
 

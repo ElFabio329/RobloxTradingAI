@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 import os
 import time
 import json
@@ -7,14 +8,18 @@ import json
 app = Flask(__name__)
 
 
-print("✅ Roblox Trading AI V4 lancé")
+# Autorise GitHub Pages à appeler Render
+CORS(
+    app,
+    resources={
+        r"/*": {
+            "origins": "*"
+        }
+    }
+)
 
 
-CACHE_TIME = 300
-
-cache = {}
-
-
+print("✅ Roblox Trading AI V4 CORS lancé")
 
 
 
@@ -22,17 +27,23 @@ def load_database():
 
     try:
 
-        with open("limiteds.json", "r", encoding="utf-8") as file:
+        with open(
+            "limiteds.json",
+            "r",
+            encoding="utf-8"
+        ) as file:
 
             return json.load(file)
 
+
     except Exception as e:
 
-        print("Erreur database :", e)
+        print(
+            "Erreur database :",
+            e
+        )
 
         return {}
-
-
 
 
 
@@ -61,7 +72,6 @@ def analyse(rap, value):
 
 
 
-
 @app.route("/")
 def home():
 
@@ -81,23 +91,8 @@ def home():
 
 
 
-
 @app.route("/item/<item_id>")
 def get_item(item_id):
-
-
-    now = time.time()
-
-
-
-    if item_id in cache:
-
-
-        if now - cache[item_id]["time"] < CACHE_TIME:
-
-            return jsonify(cache[item_id]["data"])
-
-
 
 
     database = load_database()
@@ -128,44 +123,62 @@ def get_item(item_id):
 
         "success": True,
 
+
         "id": item_id,
 
-        "name": item["name"],
 
-        "rap": item["rap"],
+        "name": item.get(
+            "name",
+            "Unknown"
+        ),
 
-        "value": item["value"],
 
-        "resell": item["value"],
+
+        "rap": int(
+            item.get(
+                "rap",
+                0
+            )
+        ),
+
+
+
+        "value": int(
+            item.get(
+                "value",
+                0
+            )
+        ),
+
+
+
+        "resell": int(
+            item.get(
+                "value",
+                0
+            )
+        ),
+
+
 
         "advice": analyse(
 
-            item["rap"],
+            int(item.get("rap",0)),
 
-            item["value"]
+            int(item.get("value",0))
 
         ),
 
-        "updated": now
+
+
+        "updated": time.time()
 
     }
-
-
-
-
-
-    cache[item_id] = {
-
-        "time": now,
-
-        "data": result
-
-    }
-
 
 
 
     return jsonify(result)
+
 
 
 
@@ -189,6 +202,7 @@ def search(text):
 
 
         if text.lower() in item["name"].lower():
+
 
             results.append({
 
@@ -218,10 +232,16 @@ def search(text):
 
 
 
+
 if __name__ == "__main__":
 
 
-    port = int(os.environ.get("PORT",10000))
+    port = int(
+        os.environ.get(
+            "PORT",
+            10000
+        )
+    )
 
 
     app.run(
