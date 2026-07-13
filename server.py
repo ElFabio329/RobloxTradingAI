@@ -8,42 +8,20 @@ app = Flask(__name__)
 print("✅ Roblox Trading AI Server lancé")
 
 
-# Cache (évite de recalculer trop souvent)
+# Cache 5 minutes
 cache = {}
 
-CACHE_TIME = 300  # 5 minutes
+CACHE_DURATION = 300
 
 
 
-# Base temporaire
-# Sera remplacée par la vraie source Limiteds ensuite
+# Base prête à recevoir les vraies données
+# Format :
+# ID Roblox : infos Limited
 
-items_database = {
-
-    "97911105474335": {
-
-        "name": "Red Sparkle Squid",
-
-        "rap": 335,
-
-        "value": 350
-
-    },
-
-
-    "97461784744442": {
-
-        "name": "Christmas Gingerbread Valkyrie",
-
-        "rap": 800,
-
-        "value": 850
-
-    }
+limiteds = {
 
 }
-
-
 
 
 
@@ -52,9 +30,9 @@ def home():
 
     return jsonify({
 
-        "status":"online",
-
-        "message":"Roblox Trading AI Server"
+        "success": True,
+        "status": "online",
+        "message": "Roblox Trading AI Server"
 
     })
 
@@ -62,60 +40,56 @@ def home():
 
 
 
-
-
 @app.route("/item/<item_id>")
-def item(item_id):
+def get_item(item_id):
 
 
     now = time.time()
 
 
-
+    # Cache
     if item_id in cache:
 
-
-        if now - cache[item_id]["time"] < CACHE_TIME:
+        if now - cache[item_id]["time"] < CACHE_DURATION:
 
             return jsonify(cache[item_id]["data"])
 
 
 
 
-    if item_id not in items_database:
+    # Recherche
+
+    if item_id not in limiteds:
 
 
         return jsonify({
 
-            "success":False,
+            "success": False,
 
-            "error":"Limited inconnu"
+            "error": "Limited non trouvé"
 
         })
 
 
 
 
-
-    item = items_database[item_id]
+    item = limiteds[item_id]
 
 
 
     result = {
 
+        "success": True,
 
-        "success":True,
+        "id": item_id,
 
-        "id":item_id,
+        "name": item["name"],
 
-        "name":item["name"],
+        "rap": item["rap"],
 
-        "rap":item["rap"],
+        "value": item["value"],
 
-        "value":item["value"],
-
-        "updated":now
-
+        "updated": now
 
     }
 
@@ -124,17 +98,53 @@ def item(item_id):
 
     cache[item_id] = {
 
+        "time": now,
 
-        "time":now,
-
-        "data":result
+        "data": result
 
     }
 
 
 
-
     return jsonify(result)
+
+
+
+
+
+@app.route("/search/<name>")
+def search(name):
+
+
+    results = []
+
+
+    for item_id, item in limiteds.items():
+
+        if name.lower() in item["name"].lower():
+
+            results.append({
+
+                "id": item_id,
+
+                "name": item["name"],
+
+                "rap": item["rap"],
+
+                "value": item["value"]
+
+            })
+
+
+
+    return jsonify({
+
+        "success": True,
+
+        "results": results
+
+    })
+
 
 
 
