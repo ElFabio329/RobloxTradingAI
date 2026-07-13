@@ -1,25 +1,16 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
+import json
 import os
 import time
-import json
 
 
 app = Flask(__name__)
 
-
-# Autorise GitHub Pages à appeler Render
-CORS(
-    app,
-    resources={
-        r"/*": {
-            "origins": "*"
-        }
-    }
-)
+CORS(app)
 
 
-print("✅ Roblox Trading AI V4 CORS lancé")
+print("✅ Roblox Trading AI V5 Server lancé")
 
 
 
@@ -31,42 +22,15 @@ def load_database():
             "limiteds.json",
             "r",
             encoding="utf-8"
-        ) as file:
+        ) as f:
 
-            return json.load(file)
-
+            return json.load(f)
 
     except Exception as e:
 
-        print(
-            "Erreur database :",
-            e
-        )
+        print(e)
 
         return {}
-
-
-
-
-
-def analyse(rap, value):
-
-
-    if value >= rap + 50:
-
-        return "🟢 Garder - Value intéressante"
-
-
-    elif value < rap:
-
-        return "🔴 Attention - Value basse"
-
-
-    else:
-
-        return "🟡 Surveiller"
-
-
 
 
 
@@ -78,13 +42,10 @@ def home():
     return jsonify({
 
         "success": True,
-
         "status": "online",
-
-        "message": "Roblox Trading AI V4"
+        "message": "Roblox Trading AI V5"
 
     })
-
 
 
 
@@ -92,141 +53,73 @@ def home():
 
 
 @app.route("/item/<item_id>")
-def get_item(item_id):
+def item(item_id):
 
 
-    database = load_database()
+    db = load_database()
 
 
 
-    if item_id not in database:
+    if item_id not in db:
 
 
         return jsonify({
 
-            "success": False,
-
-            "error": "Limited non trouvé"
+            "success":False,
+            "error":"Limited non trouvé"
 
         })
 
 
 
 
-
-    item = database[item_id]
-
-
-
-    result = {
-
-
-        "success": True,
-
-
-        "id": item_id,
-
-
-        "name": item.get(
-            "name",
-            "Unknown"
-        ),
+    limited = db[item_id]
 
 
 
-        "rap": int(
-            item.get(
-                "rap",
-                0
-            )
-        ),
+    rap = int(
+        limited.get(
+            "rap",
+            0
+        )
+    )
 
 
 
-        "value": int(
-            item.get(
-                "value",
-                0
-            )
-        ),
-
-
-
-        "resell": int(
-            item.get(
-                "value",
-                0
-            )
-        ),
-
-
-
-        "advice": analyse(
-
-            int(item.get("rap",0)),
-
-            int(item.get("value",0))
-
-        ),
-
-
-
-        "updated": time.time()
-
-    }
-
-
-
-    return jsonify(result)
-
-
-
-
-
-
-
-
-
-@app.route("/search/<text>")
-def search(text):
-
-
-    database = load_database()
-
-
-    results = []
-
-
-
-    for item_id,item in database.items():
-
-
-        if text.lower() in item["name"].lower():
-
-
-            results.append({
-
-                "id": item_id,
-
-                "name": item["name"],
-
-                "rap": item["rap"],
-
-                "value": item["value"]
-
-            })
+    value = int(
+        limited.get(
+            "value",
+            0
+        )
+    )
 
 
 
     return jsonify({
 
-        "success": True,
+        "success":True,
 
-        "results": results
+        "id":item_id,
+
+        "name":
+        limited.get(
+            "name",
+            "Unknown"
+        ),
+
+        "rap":rap,
+
+        "value":value,
+
+        "resell":value,
+
+        "advice":
+        "🟡 Surveiller",
+
+        "updated":
+        time.time()
 
     })
-
-
 
 
 
@@ -236,7 +129,7 @@ def search(text):
 if __name__ == "__main__":
 
 
-    port = int(
+    port=int(
         os.environ.get(
             "PORT",
             10000
@@ -245,9 +138,6 @@ if __name__ == "__main__":
 
 
     app.run(
-
         host="0.0.0.0",
-
         port=port
-
     )

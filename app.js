@@ -1,32 +1,43 @@
-const SERVER_URL = "https://robloxtradingai.onrender.com";
+const SERVER_URL =
+"https://robloxtradingai.onrender.com";
 
 
-let items = JSON.parse(
-    localStorage.getItem("robloxItems")
-) || [];
+
+let items = [
+
+{
+id:"97911105474335",
+nom:"Red Sparkle Squid",
+achat:300,
+rap:0,
+value:0,
+conseil:""
+},
+
+{
+id:"97461784744442",
+nom:"Christmas Gingerbread Valkyrie",
+achat:800,
+rap:0,
+value:0,
+conseil:""
+}
+
+];
+
+
 
 
 
 function save(){
 
-    localStorage.setItem(
-        "robloxItems",
-        JSON.stringify(items)
-    );
+localStorage.setItem(
+"robloxItems",
+JSON.stringify(items)
+);
 
 }
 
-
-
-function showPage(page){
-
-    document.querySelectorAll(".page")
-    .forEach(p => p.classList.add("hidden"));
-
-    document.getElementById(page)
-    .classList.remove("hidden");
-
-}
 
 
 
@@ -34,103 +45,80 @@ function showPage(page){
 async function refreshPrices(){
 
 
-    document.getElementById("status").innerHTML =
-    "🔄 Connexion serveur...";
-
-
-    for(let item of items){
-
-
-        console.log(
-            "Envoi ID :",
-            item.id
-        );
-
-
-        try{
-
-
-            let response = await fetch(
-                `${SERVER_URL}/item/${item.id}`
-            );
-
-
-            console.log(
-                "Status HTTP :",
-                response.status
-            );
-
-
-            let data =
-            await response.json();
+document.getElementById("status").innerHTML =
+"🔄 Mise à jour...";
 
 
 
-            console.log(
-                "Réponse complète :",
-                data
-            );
+for(let item of items){
+
+
+try{
+
+
+let response =
+await fetch(
+SERVER_URL+
+"/item/"+
+item.id+
+"?time="+Date.now()
+);
 
 
 
-            if(data.success){
-
-
-                item.nom =
-                data.name;
-
-
-                item.rap =
-                Number(data.rap);
-
-
-                item.value =
-                Number(data.value);
+let data =
+await response.json();
 
 
 
-                item.conseil =
-                data.advice;
+console.log(
+"API :",
+data
+);
 
 
 
-                console.log(
-                    "Sauvegarde :",
-                    item.rap,
-                    item.value
-                );
+if(data.success){
 
 
-            }
+item.nom=data.name;
 
-        }
+item.rap=Number(data.rap);
 
-        catch(error){
+item.value=Number(data.value);
 
-
-            console.log(
-                "ERREUR FETCH :",
-                error
-            );
-
-
-        }
-
-    }
-
-
-
-    save();
-
-
-    display();
-
-
-    document.getElementById("status").innerHTML =
-    "✅ Terminé";
+item.conseil=data.advice;
 
 
 }
+
+
+}
+
+catch(error){
+
+console.log(error);
+
+}
+
+
+}
+
+
+
+save();
+
+display();
+
+
+
+document.getElementById("status").innerHTML =
+"✅ Actualisé";
+
+
+}
+
+
 
 
 
@@ -140,36 +128,41 @@ async function refreshPrices(){
 function display(){
 
 
-    let list =
-    document.getElementById("itemsList");
+let list =
+document.getElementById("itemsList");
 
 
-    list.innerHTML="";
-
-
-
-    items.forEach((item,index)=>{
-
-
-        let rap =
-        item.rap ?? "ERREUR";
-
-
-        let value =
-        item.value ?? "ERREUR";
+list.innerHTML="";
 
 
 
-        list.innerHTML += `
+let total=0;
+
+
+
+items.forEach((item,index)=>{
+
+
+let profit =
+item.value-item.achat;
+
+
+
+total+=item.value;
+
+
+
+list.innerHTML+=`
 
 <div class="card">
 
 <h3>
-${item.nom}
+🎩 ${item.nom}
 </h3>
 
-<p>ID :
-${item.id}
+
+<p>
+ID : ${item.id}
 </p>
 
 
@@ -181,18 +174,24 @@ ${item.achat} Robux
 
 <p>
 📈 RAP :
-${rap} Robux
+${item.rap} Robux
 </p>
 
 
 <p>
-💎 VALUE :
-${value} Robux
+💎 Value :
+${item.value} Robux
 </p>
 
 
 <p>
-🤖 ${item.conseil || "Aucun"}
+💰 Profit :
+${profit} Robux
+</p>
+
+
+<p>
+🤖 ${item.conseil}
 </p>
 
 
@@ -207,53 +206,18 @@ Modifier achat
 
 
 
-    });
-
-
-}
+});
 
 
 
+document.getElementById("totalValue")
+.innerHTML =
+total+" Robux";
 
 
-
-async function addItem(){
-
-
-    let id =
-    document.getElementById("itemId").value;
-
-
-
-    let achat =
-    Number(
-    document.getElementById("buyPrice").value
-    );
-
-
-
-    items.push({
-
-        id:id,
-
-        nom:"Chargement...",
-
-        achat:achat,
-
-        rap:0,
-
-        value:0,
-
-        conseil:""
-
-    });
-
-
-
-    save();
-
-
-    await refreshPrices();
+document.getElementById("totalItems")
+.innerHTML =
+items.length;
 
 
 }
@@ -265,26 +229,28 @@ async function addItem(){
 function changeBuy(index){
 
 
-    let prix =
-    prompt(
-        "Prix achat :",
-        items[index].achat
-    );
+let p =
+prompt(
+"Prix achat :",
+items[index].achat
+);
 
 
-    if(prix){
+if(p){
 
-        items[index].achat =
-        Number(prix);
+items[index].achat =
+Number(p);
 
-        save();
 
-        display();
+save();
 
-    }
+display();
+
+}
 
 
 }
+
 
 
 
