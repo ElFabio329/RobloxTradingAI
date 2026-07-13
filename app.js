@@ -21,15 +21,10 @@ function save(){
 
 function showPage(page){
 
-    document
-    .querySelectorAll(".page")
-    .forEach(p => {
-        p.classList.add("hidden");
-    });
+    document.querySelectorAll(".page")
+    .forEach(p=>p.classList.add("hidden"));
 
-
-    document
-    .getElementById(page)
+    document.getElementById(page)
     .classList.remove("hidden");
 
 }
@@ -38,18 +33,11 @@ function showPage(page){
 
 
 
-
 async function refreshPrices(){
 
 
-    const status =
-    document.getElementById("status");
-
-
-    if(status)
-    status.innerHTML =
+    document.getElementById("status").innerHTML =
     "🔄 Mise à jour...";
-
 
 
 
@@ -60,13 +48,11 @@ async function refreshPrices(){
 
 
             let response = await fetch(
-
                 SERVER_URL +
                 "/item/" +
                 item.id +
-                "?nocache=" +
+                "?refresh=" +
                 Date.now()
-
             );
 
 
@@ -77,38 +63,25 @@ async function refreshPrices(){
 
 
             console.log(
-                "Réponse API :",
+                "DONNEES SERVEUR :",
                 data
             );
 
 
 
-            if(data.success){
+            if(data.success === true){
 
 
+                item.nom = data.name;
 
-                item.nom =
-                data.name;
+                item.rap = data.rap;
 
+                item.value = data.value;
 
-
-                item.rap =
-                Number(data.rap);
-
-
-
-                item.value =
-                Number(data.value);
-
-
-
-                item.conseil =
-                data.advice;
-
+                item.conseil = data.advice;
 
 
             }
-
 
 
         }
@@ -117,7 +90,7 @@ async function refreshPrices(){
 
 
             console.log(
-                "Erreur API :",
+                "ERREUR :",
                 error
             );
 
@@ -135,13 +108,11 @@ async function refreshPrices(){
 
 
 
-    if(status)
-    status.innerHTML =
+    document.getElementById("status").innerHTML =
     "✅ Prix actualisés";
 
 
 }
-
 
 
 
@@ -158,58 +129,30 @@ function display(){
 
 
 
-    if(!list)
-    return;
-
-
-
     list.innerHTML = "";
 
 
 
-    let totalValue = 0;
-
-    let totalProfit = 0;
-
-
-
-    items.forEach(
-    (item,index)=>{
-
-
-        let value =
-        Number(item.value) || 0;
+    items.forEach((item,index)=>{
 
 
 
         let rap =
-        Number(item.rap) || 0;
+        item.rap !== undefined
+        ? item.rap
+        : 0;
 
 
 
-        let achat =
-        Number(item.achat) || 0;
+        let value =
+        item.value !== undefined
+        ? item.value
+        : 0;
 
 
 
         let profit =
-        value - achat;
-
-
-
-        let percent =
-        achat > 0
-        ?
-        ((profit / achat) * 100)
-        .toFixed(1)
-        :
-        0;
-
-
-
-        totalValue += value;
-
-        totalProfit += profit;
+        value - item.achat;
 
 
 
@@ -226,15 +169,16 @@ function display(){
 
 
 <p>
-🆔 ID :
-${item.id}
+🆔 ${item.id}
 </p>
+
 
 
 <p>
 💸 Achat :
-${achat} Robux
+${item.achat} Robux
 </p>
+
 
 
 <p>
@@ -243,24 +187,24 @@ ${rap} Robux
 </p>
 
 
+
 <p>
 💎 Value :
 ${value} Robux
 </p>
 
 
+
 <p>
 💰 Profit :
 ${profit} Robux
-(${percent}%)
 </p>
+
 
 
 <p>
-🤖 Conseil :
-${item.conseil || "Analyse en cours"}
+🤖 ${item.conseil || "Pas encore analysé"}
 </p>
-
 
 
 <button onclick="changeBuy(${index})">
@@ -278,39 +222,7 @@ ${item.conseil || "Analyse en cours"}
     });
 
 
-
-    let total =
-    document.getElementById("totalValue");
-
-
-    if(total)
-    total.innerHTML =
-    totalValue + " Robux";
-
-
-
-    let profit =
-    document.getElementById("totalProfit");
-
-
-    if(profit)
-    profit.innerHTML =
-    totalProfit + " Robux";
-
-
-
-    let count =
-    document.getElementById("totalItems");
-
-
-    if(count)
-    count.innerHTML =
-    items.length;
-
-
-
 }
-
 
 
 
@@ -323,33 +235,14 @@ async function addItem(){
 
 
     let id =
-    document
-    .getElementById("itemId")
-    .value;
+    document.getElementById("itemId").value;
 
 
 
     let achat =
     Number(
-    document
-    .getElementById("buyPrice")
-    .value
+        document.getElementById("buyPrice").value
     );
-
-
-
-    if(!id || !achat){
-
-
-        alert(
-        "Ajoute un ID et un prix d'achat"
-        );
-
-
-        return;
-
-    }
-
 
 
 
@@ -361,11 +254,11 @@ async function addItem(){
 
         achat:achat,
 
-        rap:0,
+        rap:null,
 
-        value:0,
+        value:null,
 
-        conseil:""
+        conseil:"Analyse..."
 
     });
 
@@ -374,15 +267,7 @@ async function addItem(){
     save();
 
 
-
     await refreshPrices();
-
-
-
-    alert(
-    "Limited ajouté ✅"
-    );
-
 
 
 }
@@ -398,10 +283,9 @@ function changeBuy(index){
 
     let prix =
     prompt(
-    "Nouveau prix d'achat :",
-    items[index].achat
+        "Prix achat :",
+        items[index].achat
     );
-
 
 
     if(prix){
@@ -411,31 +295,14 @@ function changeBuy(index){
         Number(prix);
 
 
-
         save();
 
         display();
-
 
     }
 
 
 }
-
-
-
-
-
-
-
-setInterval(
-()=>{
-
-    refreshPrices();
-
-},
-300000
-);
 
 
 
