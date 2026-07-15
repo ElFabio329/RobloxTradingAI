@@ -1,245 +1,622 @@
-<!DOCTYPE html>
-<html lang="fr">
+const SERVER_URL = "https://robloxtradingai.onrender.com";
 
-<head>
 
-<meta charset="UTF-8">
+let items = JSON.parse(
+    localStorage.getItem("robloxItems")
+) || [
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {
+        id:"97911105474335",
+        nom:"Red Sparkle Squid",
+        achat:300,
+        rap:0,
+        value:0,
+        conseil:""
+    },
 
-<title>Roblox Trading AI</title>
+    {
+        id:"97461784744442",
+        nom:"Christmas Gingerbread Valkyrie",
+        achat:800,
+        rap:0,
+        value:0,
+        conseil:""
+    }
 
-<link rel="stylesheet" href="style.css">
+];
 
-<link rel="manifest" href="manifest.json">
 
-</head>
 
+function save(){
 
-<body>
+    localStorage.setItem(
+        "robloxItems",
+        JSON.stringify(items)
+    );
 
+}
 
-<header>
 
-<h1>🤖 Roblox Trading AI</h1>
 
-<p id="status">
-Connecté
-</p>
 
-<button onclick="refreshPrices()">
-🔄 Actualiser les prix
-</button>
+function showPage(page){
 
-</header>
 
+    document
+    .querySelectorAll(".page")
+    .forEach(section=>{
 
+        section.classList.add("hidden");
 
-<nav>
+    });
 
-<button onclick="showPage('home')">
-🏠 Accueil
-</button>
 
 
-<button onclick="showPage('items')">
-🎩 Limiteds
-</button>
+    let target =
+    document.getElementById(page);
 
 
-<button onclick="showPage('add')">
-➕ Ajouter
-</button>
 
+    if(target){
 
-<button onclick="showPage('trades')">
-🤝 Trades
-</button>
+        target.classList.remove("hidden");
 
+    }
 
-</nav>
+}
 
 
 
 
 
-<section id="home" class="page">
+function money(value){
 
+    return Number(value || 0)
+    .toLocaleString("fr-FR")
+    + " Robux";
 
-<h2>
-📊 Dashboard
-</h2>
+}
 
 
-<div class="dashboard">
 
 
-<div class="box">
+function calculateProfit(item){
 
-<h3>
-💰 Valeur
-</h3>
 
-<p id="totalValue">
-0 Robux
-</p>
+    return Number(item.value || 0)
+    -
+    Number(item.achat || 0);
 
-</div>
+}
 
 
 
-<div class="box">
 
-<h3>
-📈 Profit
-</h3>
+function getAdvice(item){
 
-<p id="totalProfit">
-0 Robux
-</p>
 
-</div>
+    let profit =
+    calculateProfit(item);
 
 
 
-<div class="box">
+    if(item.value === 0){
 
-<h3>
-🎩 Items
-</h3>
+        return "⏳ Analyse en cours";
 
-<p id="totalItems">
-0
-</p>
+    }
 
-</div>
 
 
+    if(profit >= 50){
 
-</div>
+        return "🟢 Possible revente";
 
+    }
 
 
-<h2>
-🔔 Alertes
-</h2>
 
+    if(item.value < item.achat){
 
-<div id="alerts">
-Aucune alerte
-</div>
+        return "🔴 Perte actuelle";
 
+    }
 
-</section>
 
 
+    return "🟡 Surveiller";
 
+}
+function display(){
 
 
+    const list =
+    document.getElementById("itemsList");
 
 
-<section id="items" class="page hidden">
+    if(!list) return;
 
 
-<h2>
-🎩 Mes Limiteds
-</h2>
 
+    list.innerHTML = "";
 
-<div id="itemsList">
 
-</div>
 
+    let totalValue = 0;
 
-</section>
+    let totalProfit = 0;
 
 
 
+    items.forEach((item,index)=>{
 
 
+        let rap =
+        Number(item.rap || 0);
 
 
+        let value =
+        Number(item.value || 0);
 
-<section id="add" class="page hidden">
 
+        let achat =
+        Number(item.achat || 0);
 
-<h2>
-➕ Ajouter un Limited
-</h2>
 
 
-<input 
-id="itemId"
-placeholder="ID Roblox">
+        let profit =
+        calculateProfit(item);
 
 
-<br>
 
+        totalValue += value;
 
-<input 
-id="itemName"
-placeholder="Nom">
+        totalProfit += profit;
 
 
-<br>
 
+        list.innerHTML += `
 
-<input
-id="buyPrice"
-placeholder="Prix achat">
+        <div class="box">
 
 
-<br>
+            <h3>
+            🎩 ${item.nom}
+            </h3>
 
 
-<button onclick="addItem()">
-Ajouter
-</button>
+            <p>
+            🆔 ID : ${item.id}
+            </p>
 
 
-</section>
+            <p>
+            💸 Achat : ${money(achat)}
+            </p>
 
 
+            <p>
+            📈 RAP : ${money(rap)}
+            </p>
 
 
+            <p>
+            💎 Value : ${money(value)}
+            </p>
 
 
+            <p>
+            💰 Profit : ${money(profit)}
+            </p>
 
 
-<section id="trades" class="page hidden">
+            <p>
+            🤖 ${item.conseil || getAdvice(item)}
+            </p>
 
 
-<h2>
-🤝 Trade Calculator
-</h2>
 
+            <button onclick="changeBuy(${index})">
+            ✏️ Modifier achat
+            </button>
 
-<p>
-Bientôt disponible 🚀
-</p>
 
+            <button onclick="deleteItem(${index})">
+            🗑 Supprimer
+            </button>
 
-</section>
 
+        </div>
 
+        `;
 
 
+    });
 
 
 
-<audio id="alertSound">
+    let valueBox =
+    document.getElementById("totalValue");
 
-<source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg">
 
-</audio>
+    if(valueBox){
 
+        valueBox.innerHTML =
+        money(totalValue);
 
+    }
 
 
 
-<script src="app.js?v=11"></script>
+    let profitBox =
+    document.getElementById("totalProfit");
 
 
-</body>
+    if(profitBox){
 
-</html>
+        profitBox.innerHTML =
+        money(totalProfit);
+
+    }
+
+
+
+    let countBox =
+    document.getElementById("totalItems");
+
+
+    if(countBox){
+
+        countBox.innerHTML =
+        items.length;
+
+    }
+
+
+
+    updateAlerts();
+
+}
+
+
+
+
+
+function updateAlerts(){
+
+
+    let alerts =
+    document.getElementById("alerts");
+
+
+
+    if(!alerts) return;
+
+
+
+    let list = [];
+
+
+
+    items.forEach(item=>{
+
+
+        let profit =
+        calculateProfit(item);
+
+
+
+        if(profit > 0){
+
+
+            list.push(
+                "🟢 "
+                +
+                item.nom
+                +
+                " +"
+                +
+                profit
+                +
+                " Robux"
+            );
+
+
+        }
+
+
+    });
+
+
+
+    alerts.innerHTML =
+    list.length
+    ?
+    list.join("<br>")
+    :
+    "Aucune alerte";
+
+}
+
+
+
+
+
+function changeBuy(index){
+
+
+    let price =
+    prompt(
+        "Nouveau prix d'achat :",
+        items[index].achat
+    );
+
+
+
+    if(price !== null){
+
+
+        items[index].achat =
+        Number(price);
+
+
+        save();
+
+        display();
+
+    }
+
+}
+
+
+
+
+function deleteItem(index){
+
+
+    if(confirm("Supprimer ce Limited ?")){
+
+
+        items.splice(index,1);
+
+
+        save();
+
+        display();
+
+    }
+
+}
+async function addItem(){
+
+
+    let id =
+    document.getElementById("itemId").value;
+
+
+    let name =
+    document.getElementById("itemName").value;
+
+
+    let buy =
+    Number(
+        document.getElementById("buyPrice").value
+    );
+
+
+
+    if(!id || !buy){
+
+        alert("Ajoute un ID et un prix d'achat");
+
+        return;
+
+    }
+
+
+
+    items.push({
+
+        id:id,
+
+        nom:name || "Limited Roblox",
+
+        achat:buy,
+
+        rap:0,
+
+        value:0,
+
+        conseil:"⏳ Analyse en cours"
+
+    });
+
+
+
+    save();
+
+    display();
+
+
+    await refreshPrices();
+
+}
+
+
+
+
+
+
+
+async function refreshPrices(){
+
+
+    let status =
+    document.getElementById("status");
+
+
+    if(status){
+
+        status.innerHTML =
+        "🔄 Analyse des Limiteds...";
+
+    }
+
+
+
+    for(let item of items){
+
+
+        try{
+
+
+            let response =
+            await fetch(
+
+                SERVER_URL +
+                "/item/" +
+                item.id +
+                "?time=" +
+                Date.now()
+
+            );
+
+
+
+            let data =
+            await response.json();
+
+
+
+            console.log(
+                "API ROBLOX AI :",
+                data
+            );
+
+
+
+            if(data.success){
+
+
+                item.nom =
+                data.name;
+
+
+                item.rap =
+                Number(data.rap);
+
+
+                item.value =
+                Number(data.value);
+
+
+                item.conseil =
+                data.advice;
+
+
+            }
+
+
+
+        }
+        catch(error){
+
+
+            console.log(
+                "Erreur API :",
+                error
+            );
+
+
+        }
+
+
+    }
+
+
+
+    save();
+
+
+    display();
+
+
+
+    if(status){
+
+        status.innerHTML =
+        "✅ Prix actualisés";
+
+    }
+
+
+}
+
+
+
+
+
+
+document
+.querySelectorAll("nav button")
+.forEach(button=>{
+
+
+    button.addEventListener(
+        "click",
+        ()=>{
+
+
+            showPage(
+                button.dataset.page
+            );
+
+
+        }
+    );
+
+
+});
+
+
+
+
+
+
+let refreshButton =
+document.getElementById(
+    "refreshButton"
+);
+
+
+
+if(refreshButton){
+
+    refreshButton.onclick =
+    refreshPrices;
+
+}
+
+
+
+
+let addButton =
+document.getElementById(
+    "addButton"
+);
+
+
+
+if(addButton){
+
+    addButton.onclick =
+    addItem;
+
+}
+
+
+
+
+
+
+display();
